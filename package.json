@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension-boilerplate-react",
-  "version": "4.4.0",
-  "description": "A chrome extension boilerplate built with React 17, Webpack 5, and Webpack Dev Server 4",
+  "name": "screenshot-browser-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension with which you can take a screenshot",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,7 +16,8 @@
     "@hot-loader/react-dom": "^17.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-hot-loader": "^4.13.1"
+    "react-hot-loader": "^4.13.1",
+    "react-screen-capture": "^1.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
