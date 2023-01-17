@@ -1,6 +1,6 @@
 let url;
 
-chrome.action.onClicked.addListener(function (tab) {
+chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.captureVisibleTab((dataUrl) => {
     chrome.downloads.download({
       filename: "screenshot.jpg",
@@ -11,14 +11,14 @@ chrome.action.onClicked.addListener(function (tab) {
   });
 
   chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
+    (request, sender, sendResponse) => {
       sendResponse(`${url}`);
     }
   )
 })
 
 function showReadme(info, tab) {
-  let url = chrome.runtime.getURL("screen.html");
+  const url = chrome.runtime.getURL("screen.html");
   chrome.tabs.create({ url });
 }
 
