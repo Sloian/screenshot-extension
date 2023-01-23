@@ -1,0 +1,35 @@
+.buttonsWrapper{
+  position: absolute;
+  gap: 1;
+  top: 5%;  /* position the top  edge of the element at the middle of the parent */
+  left: 50%; /* position the left edge of the element at the middle of the parent */
+  opacity: 0.7;
+  transform: translate(-50%, -50%);
+  background-color: brown;
+  padding: 10px;
+  opacity: 0.35;
+  border-radius: 10px;
+}
+
+
+.cropButton{
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 0;
+  transition: 0.15s;
+}
+
+.cropButton:hover{
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  min-width: 51.5px;
+  min-height: 52px;
+}
+
+.cropButton:active{
+  opacity: 0.15;
+  min-width: 53px;
+  min-height: 53px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
