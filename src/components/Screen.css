@@ -1,35 +1,47 @@
-.buttonsWrapper{
+.button-crop{
   position: absolute;
-  gap: 1;
-  top: 5%;  /* position the top  edge of the element at the middle of the parent */
-  left: 50%; /* position the left edge of the element at the middle of the parent */
-  opacity: 0.7;
-  transform: translate(-50%, -50%);
-  background-color: brown;
-  padding: 10px;
-  opacity: 0.35;
-  border-radius: 10px;
-}
-
-
-.cropButton{
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   border: 0;
   transition: 0.15s;
 }
 
-.cropButton:hover{
+.button-crop:hover{
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
   min-width: 51.5px;
   min-height: 52px;
 }
 
-.cropButton:active{
+.button-crop:active{
   opacity: 0.15;
   min-width: 53px;
   min-height: 53px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
 }
 
+.image-property{
+  background-color: black;
+  color: white;
+  padding: 4px;
+  font-size: 14;
+}
+
+.screen{
+  height: 100vh;
+  width: 100vw;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.toolbar{
+  padding: 2px;
+  border-radius: 3px;
+  background: -webkit-gradient( linear, left top, left bottom, from(#fafbfb), to(#cbcec0));
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5), inset 0px 0px 1px rgba(255, 255, 255, 0.5);
+}
+
+.toolbar-button:hover{
+  background-color: aqua;
+}

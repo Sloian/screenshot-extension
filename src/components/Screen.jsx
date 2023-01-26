@@ -1,60 +1,56 @@
 import React from 'react';
-import { useEffect, useState } from "react";
-import CanvasDraw from 'react-canvas-draw';
+import { useEffect, useState, useRef } from "react";
 import './Screen.css';
-
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css';
-
-// import { SketchField, Tools } from 'react-sketch';
-window.addEventListener("beforeunload", function () {
-  chrome.tabs.update(activeTab, { active: true });                            //Webkit, Safari, Chrome
-});
+import { useDebounceEffect } from './useDebounceEffect'
+import { imgPreview } from './imgPreview';
+import printJS from 'print-js'
+import hor_copy from '../assets/icons/toolbar_res/hor_copy.png'
+import hor_print from '../assets/icons/toolbar_res/hor_print.png'
+import hor_save from '../assets/icons/toolbar_res/hor_save.png'
+import hor_search from '../assets/icons/toolbar_res/hor_search.png'
+import hor_upload from '../assets/icons/toolbar_res/hor_upload.png'
+import hor_close from '../assets/icons/toolbar_res/hor_close.png'
+import hor_share from '../assets/icons/toolbar_res/hor_share.png'
 
 const Screen = () => {
-
-  const [urlImg, setUrlImg] = useState('');
   const [activeTab, setActiveTab] = useState(0)
-
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  const [color, setColor] = useState('ffc600');
-  const [brushRadius, setBrushRadius] = useState(10);
-  const [lazyRadius, setLazyRadius] = useState(12);
-
-  let saveableCanvas;
-
+  const [imgCrop, setImgCrop] = useState('')
+  const [imgSrc, setImgSrc] = useState('')
+  const imgRef = useRef(null)
+  const [crop, setCrop] = useState({ aspect: 16 / 9 })
+  const [completedCrop, setCompletedCrop] = useState()
+  const [scale, setScale] = useState(1)
+  const [rotate, setRotate] = useState(0)
 
   useEffect(() => {
     chrome.runtime.sendMessage('get-user-data', (response) => {
-      console.log(response)
-      setUrlImg(response.url)
+      setImgSrc(response.url)
       setActiveTab(response.activeTab)
     });
-
   }, []);
 
   const downloadPage = () => {
-    chrome.tabs.captureVisibleTab((dataUrl) => {
-      chrome.downloads.download({
-        filename: "screenshot.jpg",
-        url: dataUrl
-      })
+    console.log(imgCrop)
+    chrome.downloads.download({
+      filename: "screenshot.jpg",
+      url: imgCrop
+    })
+    cancelScreen()
+  }
+
+  const printPDF = () => {
+    const pdfBlob = new Blob([completedCrop], { type: "application/pdf" });
+    const url = URL.createObjectURL(pdfBlob);
+    printJS({
+      printable: url,
+      type: 'pdf',
+      base64: true
     });
   }
 
-  const [srcImg, setSrcImg] = useState(null);
-  const [image, setImage] = useState(urlImg);
-  const [crop, setCrop] = useState({ aspect: 16 / 9 });
-  const [result, setResult] = useState(null);
-
-  const handleImage = async (event) => {
-    console.log('dsadas')
-    console.log(event)
-    setSrcImg(URL.createObjectURL(event.target.files[0]));
-    console.log(srcImg)
-    console.log(event.target.files[0]);
+  const copyPicture = async () => {
   };
 
   const cancelScreen = () => {
@@ -62,206 +58,64 @@ const Screen = () => {
       window.close()
       chrome.tabs.update(activeTab, { active: true });
     }
-
     return change();
   }
 
-  const getCroppedImg = async () => {
-    try {
-      console.log(image)
-      const canvas = document.createElement("canvas");
-      // debugger
-      console.log(canvas.naturalWidth)
-      const scaleX = image.naturalWidth / image.width;
-      // debugger
-      const scaleY = image.naturalHeight / image.height;
-      // debugger
-      canvas.width = crop.width;
-      // debugger
-      canvas.height = crop.height;
-      const ctx = canvas.getContext("2d");
-      // debugger
-      ctx.drawImage(
-        image,
-        crop.x * scaleX,
-        crop.y * scaleY,
-        crop.width * scaleX,
-        crop.height * scaleY,
-        0,
-        0,
-        crop.width,
-        crop.height
-      );
-      const base64Image = canvas.toDataURL("image/jpeg", 1);
-      console.log(base64Image)
-      setResult(base64Image);
-      console.log(result);
-    } catch (e) {
-      console.log("crop the image");
-    }
-  };
-
-  console.log(crop)
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(result);
-  }
-  return (
-    <div className='App'>
-      {/*
-      <SketchField width='1024px'
-        height='768px'
-        tool={Tools.Pencil}
-        lineColor='black'
-        lineWidth={3} /> */}
-
-
-
-      {/* <div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImage}
-          />
-        </div > */}
-
-      <ReactCrop
-        src={srcImg}
-        onImageLoaded={setImage}
-        crop={crop}
-        onChange={(c) => setCrop(c)}
-      >
-        <CanvasDraw
-          ref={canvasDraw => (saveableCanvas = canvasDraw)}
-          imgSrc={urlImg}
-          brushColor={color}
-          brushRadius={brushRadius}
-          lazyRadius={lazyRadius}
-          canvasHeight={windowHeight}
-          canvasWidth={windowWidth}
-        >
-        </CanvasDraw>
-      </ReactCrop>
-      {crop.height > 20 ? (
-        <div>
-          <button
-            className='cropButton'
-            style={{ position: 'absolute', top: `${crop.y + crop.height}px`, left: `${crop.x + crop.width + 20}px`, gap: '1', width: '50px', height: '50px' }}
-            onClick={getCroppedImg}
-          >
-            Crop
-          </button>
-          <button
-            className='cropButton'
-            style={{ position: 'absolute', top: `${crop.y + crop.height - 60}px`, left: `${crop.x + crop.width + 20}px`, gap: '1', width: '50px', height: '50px' }}
-            onClick={cancelScreen}
-          >
-            Cancel
-          </button>
-        </div>
-      ) : ''}
-      {
-        result && (
-          <div>
-            <img src={result} alt="cropped image" />
-          </div>
+  useDebounceEffect(
+    async () => {
+      if (
+        completedCrop?.width &&
+        completedCrop?.height &&
+        imgRef.current
+      ) {
+        imgPreview(
+          imgRef.current,
+          completedCrop,
+          scale,
+          rotate,
+          setImgCrop
         )
       }
-      {/* <ReactCrop
-        src={src}
+    },
+    100,
+    [completedCrop, scale, rotate],
+  )
+
+  return (
+    <div className='App'>
+      <ReactCrop
         crop={crop}
-        ruleOfThirds
-        onImageLoaded={onImageLoaded}
-        onComplete={onCropComplete}
-        onChange={(c) => setCrop(c)}
+        onChange={(crop) => setCrop(crop)}
+        onComplete={(c) => setCompletedCrop(c)}
       >
-        <img src={urlImg} />
-      </ReactCrop> */}
-
-      {/* {
-        croppedImageUrl && (
-          <img alt="Crop" style={{ maxWidth: "100%" }} src={croppedImageUrl} />
-        )} */}
-
-      {/* <ReactCrop
-        src={src}
-        crop={crop}
-        ruleOfThirds
-        onImageLoaded={this.onImageLoaded}
-        onComplete={this.onCropComplete}
-        onChange={this.onCropChange}
-      /> */}
-      {/* <div className='buttonsWrapper'>
-        <button
-          onClick={() => {
-            chrome.tabs.captureVisibleTab((dataUrl) => {
-              console.log(dataUrl)
-              chrome.downloads.download({
-                filename: "screenshot.jpg",
-                url: dataUrl
-              })
-            });
-          }}
-        >
-          GetDataURL
-        </button>
-        <button
-          onClick={() => {
-            localStorage.setItem(
-              "savedDrawing",
-              saveableCanvas.getSaveData(),
-            );
-            console.log(saveableCanvas.getSaveData())
-          }}
-        >
-          Save
-        </button>
-        <button
-          onClick={() => {
-            saveableCanvas.eraseAll();
-          }}
-        >
-          Erase
-        </button>
-        <button
-          onClick={() => {
-            saveableCanvas.undo();
-          }}
-        >
-          Undo
-        </button>
-        <button
-          onClick={() => {
-            console.log(saveableCanvas.getDataURL());
-            alert("DataURL written to console")
-          }}
-        >
-          GetDataURL
-        </button>
+        <img
+          className='screen'
+          ref={imgRef}
+          alt="Crop me"
+          src={imgSrc}
+        />
+      </ReactCrop>
+      {crop.height > 10 || crop.width > 10 ? (
         <div>
-          <label>Brush-Radius:</label>
-          <input
-            type="number"
-            value={brushRadius}
-            onChange={e =>
-              brushRadius(brushRadius = parseInt(e.target.value, 10))
-            }
-          />
+          <div className='image-property'
+            style={{ position: 'absolute', top: `${crop.y - 28}px`, left: `${crop.x + 3}px` }}
+          >
+            {Math.trunc(crop.width)}x{Math.trunc(crop.height)}
+          </div>
+          <div id="toolbar_actions" className="toolbar toolbar-horizontal" style={{ position: 'absolute', top: `${crop.y + crop.height + 8}px`, left: `${crop.x + crop.width - 214}px` }}>
+            <img id="upload" alt="Завантажити на сервер prntscr.com (Ctrl+D)" title="Завантажити на сервер prntscr.com (Ctrl+D)" className="toolbar-button " src={hor_upload} />
+            <img id="share" alt="Поділитися в соціальних мережах" title="Поділитися в соціальних мережах" className="toolbar-button " src={hor_share} />
+            <img id="search_google" alt="Шукати схожі зображення в Google" title="Шукати схожі зображення в Google" className="toolbar-button " src={hor_search} />
+            <img id="print" alt="Друкувати (Ctrl+P)" title="Друкувати (Ctrl+P)" className="toolbar-button " src={hor_print} onClick={printPDF} />
+            <img id="copy" alt="Копіювати (Ctrl+C)" title="Копіювати (Ctrl+C)" className="toolbar-button " src={hor_copy} onClick={copyPicture} />
+            <img id="save" alt="Зберегти (Ctrl+S)" title="Зберегти (Ctrl+S)" className="toolbar-button " src={hor_save} onClick={downloadPage} />
+            <img id="close" alt="Закрити (Ctrl+X)" title="Закрити (Ctrl+X)" className="toolbar-button " src={hor_close} onClick={cancelScreen} />
+          </div>
+
         </div>
-        <div>
-          <label>Lazy-Radius:</label>
-          <input
-            type="number"
-            value={lazyRadius}
-            onChange={e =>
-              setLazyRadius(lazyRadius = parseInt(e.target.value, 10))
-            }
-          />
-        </div> */}
+      ) : ''
+      }
     </div >
-
-
   );
 };
 

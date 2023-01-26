@@ -20,7 +20,7 @@
     "react-canvas-draw": "^1.2.1",
     "react-screen-capture": "^1.0.1",
     "react-image-crop": "^10.0.9",
-    "react-sketch": "^0.5.1"
+    "clipboard-polyfill": "^4.0.0-rc8"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
