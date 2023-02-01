@@ -24,7 +24,7 @@
   background-color: black;
   color: white;
   padding: 4px;
-  font-size: 14;
+  font-size: 14px;
 }
 
 .screen{
@@ -40,8 +40,34 @@
   border-radius: 3px;
   background: -webkit-gradient( linear, left top, left bottom, from(#fafbfb), to(#cbcec0));
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5), inset 0px 0px 1px rgba(255, 255, 255, 0.5);
+  z-index: 2;
 }
 
 .toolbar-button:hover{
   background-color: aqua;
+}
+
+.toolbar-horizontal{
+  display: flex;
+  flex-direction: row;
+}
+
+.toolbar-vertical{
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar-vertical .toolbar-separator {
+  height: 0;
+  width: 22px;
+  border-bottom: 1px solid #666666;
+  margin-left: 2px;
+}
+
+.toolbar-horizontal .toolbar-separator {
+  width: 0;
+  height: 22px;
+  border-left: 1px solid #666666;
+  margin-top: 2px;
+  float: left;
 }

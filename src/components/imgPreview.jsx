@@ -10,6 +10,8 @@ export async function imgPreview(
   setImgCrop
 ) {
   const canvas = document.createElement('canvas')
+
+
   canvasPreview(image, canvas, crop, scale, rotate)
   previewUrl = canvas.toDataURL('image/jpeg')
 

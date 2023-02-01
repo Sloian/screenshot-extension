@@ -10,12 +10,23 @@ export async function canvasPreview(
 ) {
   const ctx = canvas.getContext('2d')
 
+
+  console.log("тут")
+  console.log(image.children[0].getContext('2d'))
+  console.log(image.children)
+  // console.log(image.children[1].getContext('2d'))
+  console.log(ctx)
+
+  console.log(canvas)
+
+
   if (!ctx) {
     throw new Error('No 2d context')
   }
 
-  const scaleX = image.naturalWidth / image.width
-  const scaleY = image.naturalHeight / image.height
+  console.log(image.children[1])
+  const scaleX = image.children[1].naturalWidth / image.children[1].width
+  const scaleY = image.children[1].naturalHeight / image.children[1].height
   const pixelRatio = window.devicePixelRatio
 
   canvas.width = Math.floor(crop.width * scaleX * pixelRatio)
@@ -27,8 +38,8 @@ export async function canvasPreview(
   const cropX = crop.x * scaleX
   const cropY = crop.y * scaleY
   const rotateRads = rotate * TO_RADIANS
-  const centerX = image.naturalWidth / 2
-  const centerY = image.naturalHeight / 2
+  const centerX = image.children[1].naturalWidth / 2
+  const centerY = image.children[1].naturalHeight / 2
 
   ctx.save()
   ctx.translate(-cropX, -cropY)
@@ -36,17 +47,10 @@ export async function canvasPreview(
   ctx.rotate(rotateRads)
   ctx.scale(scale, scale)
   ctx.translate(-centerX, -centerY)
-  ctx.drawImage(
-    image,
-    0,
-    0,
-    image.naturalWidth,
-    image.naturalHeight,
-    0,
-    0,
-    image.naturalWidth,
-    image.naturalHeight,
-  )
+  ctx.drawImage(image.children[1], 0, 0)
+  ctx.drawImage(image.children[0], 0, 0)
+
+  console.log(ctx)
 
   ctx.restore()
 }
