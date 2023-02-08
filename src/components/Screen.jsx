@@ -3,36 +3,38 @@ import { useEffect, useState, useRef } from "react";
 import './Screen.css';
 import ReactCrop from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css';
-import { useDebounceEffect } from './useDebounceEffect'
-import { imgPreview } from './imgPreview';
-// import FreeHandDraw from './FreeHandDraw';
-import Canvas from './Canvas';
-import { Stage, Layer, Rect, Text, Circle, Line } from 'react-konva';
-import SceneWithDrawables from './classTools';
-import ConvaReact from './reactConva';
+import { useDebounceEffect } from './Crop/useDebounceEffect'
+import { imgPreview } from './Crop/imgPreview';
+import App from './ToolbarKonva/classTools';
 
-import hor_copy from '../assets/icons/toolbar_res/hor_copy.png'
-import hor_print from '../assets/icons/toolbar_res/hor_print.png'
+import HomePage from './TestKonva/HomePage'
+import SuperSceneWithDrawables from './ToolbarKonva/superTestClassTools'
+import { CircleDrawable } from './ToolbarKonva/superTestClassTools';
+
 import hor_save from '../assets/icons/toolbar_res/hor_save.png'
 import hor_search from '../assets/icons/toolbar_res/hor_search.png'
 import hor_upload from '../assets/icons/toolbar_res/hor_upload.png'
-import hor_close from '../assets/icons/toolbar_res/hor_close.png'
 import hor_share from '../assets/icons/toolbar_res/hor_share.png'
-
-import draw_pencil from '../assets/icons/toolbar_res/draw_pencil.png'
-import draw_line from '../assets/icons/toolbar_res/draw_line.png'
-import draw_arrow from '../assets/icons/toolbar_res/draw_arrow.png'
-import draw_rectangle from '../assets/icons/toolbar_res/draw_rectangle.png'
 import draw_marker from '../assets/icons/toolbar_res/draw_marker.png'
-import draw_text from '../assets/icons/toolbar_res/draw_text.png'
-import draw_undo from '../assets/icons/toolbar_res/draw_undo.png'
+//
+import DragHandlerIcon from '@atlaskit/icon/glyph/drag-handler'
+import MediaServicesLineIcon from '@atlaskit/icon/glyph/media-services/line'
+import MediaServicesArrowIcon from '@atlaskit/icon/glyph/media-services/arrow'
+import MediaServicesRectangleIcon from '@atlaskit/icon/glyph/media-services/rectangle'
+import MediaServicesTextIcon from '@atlaskit/icon/glyph/media-services/text'
+import UndoIcon from '@atlaskit/icon/glyph/undo'
+import CopyIcon from '@atlaskit/icon/glyph/copy'
+import CrossIcon from '@atlaskit/icon/glyph/cross'
+import PdfIcon from '@atlaskit/icon/glyph/pdf'
+import ShareIcon from '@atlaskit/icon/glyph/share'
+import CheckIcon from '@atlaskit/icon/glyph/check'
 
 
 
 const Screen = () => {
 
-  const windowHeight = window.innerHeight
-  const windowWidth = window.innerWidth
+  // const windowHeight = window.innerHeight
+  // const windowWidth = window.innerWidth
   const [activeTab, setActiveTab] = useState(0)
   const [imgCrop, setImgCrop] = useState('')
   const [imgSrc, setImgSrc] = useState('')
@@ -41,13 +43,13 @@ const Screen = () => {
   const [completedCrop, setCompletedCrop] = useState()
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
-
   const [disabledBool, setDisabledBool] = useState(false)
 
+  const [pay, setPay] = useState(0)
+
   const [canvasStyle, setCanvasStyle] = useState({
-    border: "1px solid black",
     position: 'absolute',
-    zIndex: 2
+    zIndex: 0,
   })
 
   useEffect(() => {
@@ -63,16 +65,15 @@ const Screen = () => {
   }, [renderCrop]);
 
 
-
   const downloadPage = () => {
-    setRenderCrop(prev => prev + 1)
+
     chrome.downloads.download({
-      filename: "screenshot.jpg",
+      filename: "screenshot.png",
       url: imgCrop
     })
     cancelScreen()
-  }
 
+  }
 
   // const printPDF = () => {
   //   const pdfBlob = new Blob([completedCrop], { type: "application/pdf" });
@@ -84,9 +85,6 @@ const Screen = () => {
   //   });
   // }
 
-  const copyPicture = () => {
-  };
-
   const cancelScreen = () => {
     const change = () => {
       window.close()
@@ -95,6 +93,9 @@ const Screen = () => {
     return change();
   }
 
+  const payChange = () => {
+    setPay(prev => prev + 1)
+  }
 
   useDebounceEffect(
     async () => {
@@ -113,16 +114,14 @@ const Screen = () => {
       }
     },
     100,
-    [completedCrop, scale, rotate],
+    [completedCrop, scale, rotate, pay],
   )
-
-  console.log(completedCrop)
 
 
   const draw_arrow_with_hand = () => {
     setDisabledBool(!disabledBool)
     if (!disabledBool) {
-      setCanvasStyle({ ...canvasStyle, zIndex: 2 })
+      setCanvasStyle({ ...canvasStyle, zIndex: 3 })
     }
     else {
       setCanvasStyle({ ...canvasStyle, zIndex: 0 })
@@ -130,8 +129,6 @@ const Screen = () => {
 
   }
 
-  // console.log(imgRef)
-  const [a, setA] = useState()
 
   return (
     <div className='App'>
@@ -146,49 +143,53 @@ const Screen = () => {
         <div
           ref={imgRef}
         >
-          { }
-          <Canvas
-            // setA={setA}
-            width={windowWidth}
-            height={windowHeight}
+          <div
             style={canvasStyle}
-          />
+          >
+            <SuperSceneWithDrawables
+              setNewDrawableType={"ArrowDrawable"}
+            />
+            {/* <Drawable /> */}
+          </div>
           <img
             className='screen'
             alt="Crop me"
             src={imgSrc}
           />
         </div>
-      </ReactCrop>
-      {crop.height > 10 || crop.width > 10 ? (
-        <div>
-          <div className='image-property'
-            style={{ position: 'absolute', top: `${crop.y - 28}px`, left: `${crop.x + 3}px` }}
-          >
-            {Math.trunc(crop.width)}x{Math.trunc(crop.height)}
+      </ReactCrop >
+      {
+        crop.height > 10 || crop.width > 10 ? (
+          <div>
+            <div className='image-property'
+              style={{ position: 'absolute', top: `${crop.y - 28}px`, left: `${crop.x + 3}px` }}
+            >
+              {Math.trunc(crop.width)}x{Math.trunc(crop.height)}
+            </div>
+            <div id="toolbar_actions" className="toolbar toolbar-horizontal" style={{ position: 'absolute', top: `${crop.y + crop.height + 6}px`, left: `${crop.x + crop.width - 214}px` }}>
+              <img id="upload" alt="Завантажити на сервер prntscr.com (Ctrl+D)" title="Завантажити на сервер prntscr.com (Ctrl+D)" className="toolbar-button " src={hor_upload} />
+              <span id="share" alt="Поділитися в соціальних мережах" title="Поділитися в соціальних мережах" className="toolbar-button "><ShareIcon /></span>
+              <img id="share" alt="Поділитися в соціальних мережах" title="Поділитися в соціальних мережах" className="toolbar-button " src={hor_share} />
+              <img id="search_google" alt="Шукати схожі зображення в Google" title="Шукати схожі зображення в Google" className="toolbar-button " src={hor_search} />
+              <span id="print" alt="Друкувати (Ctrl+P)" title="Друкувати (Ctrl+P)" className="toolbar-button "><PdfIcon /></span>
+              <span id="copy" alt="Копіювати (Ctrl+C)" title="Копіювати (Ctrl+C)" className="toolbar-button "><CopyIcon /></span>
+              <span id="check" alt="Зберегти канвас" title="Зберегти канвас" className="toolbar-button " onClick={payChange} ><CheckIcon /></span>
+              <img id="save" alt="Зберегти (Ctrl+S)" title="Зберегти (Ctrl+S)" className="toolbar-button " src={hor_save} onClick={downloadPage} />
+              <div className='toolbar-separator'></div>
+              <span id="close" alt="Закрити (Ctrl+X)" title="Закрити (Ctrl+X)" onClick={cancelScreen} className="toolbar-button "><CrossIcon /></span>
+            </div>
+            <div id="toolbar_edit" className="toolbar toolbar-vertical" style={{ position: 'absolute', top: `${crop.y + crop.height - 195}px`, left: `${crop.x + crop.width + 6}px` }}>
+              <span id="pencil" alt="Олівець" title="Олівець" onClick={draw_arrow_with_hand} className="toolbar-button "><DragHandlerIcon /></span>
+              <span id="line" alt="Лінія" title="Лінія" className="toolbar-button "><MediaServicesLineIcon /></span>
+              <span id="arrow" alt="Стрілка" title="Стрілка" className="toolbar-button "><MediaServicesArrowIcon /></span>
+              <span id="rectangle" alt="Прямокукник" title="Прямокукник" className="toolbar-button "><MediaServicesRectangleIcon /></span>
+              <img id="marker" alt="Маркер" title="Маркер" className="toolbar-button " src={draw_marker} />
+              <span id="text" alt="Текст" title="Текст" className="toolbar-button "><MediaServicesTextIcon /></span>
+              <div className='toolbar-separator'></div>
+              <span id="undo" alt="Скасувати (Ctrl+Z)" title="Скасувати (Ctrl+Z)" className="toolbar-button "><UndoIcon /></span>
+            </div>
           </div>
-          <div id="toolbar_actions" className="toolbar toolbar-horizontal" style={{ position: 'absolute', top: `${crop.y + crop.height + 6}px`, left: `${crop.x + crop.width - 214}px` }}>
-            <img id="upload" alt="Завантажити на сервер prntscr.com (Ctrl+D)" title="Завантажити на сервер prntscr.com (Ctrl+D)" className="toolbar-button " src={hor_upload} />
-            <img id="share" alt="Поділитися в соціальних мережах" title="Поділитися в соціальних мережах" className="toolbar-button " src={hor_share} />
-            <img id="search_google" alt="Шукати схожі зображення в Google" title="Шукати схожі зображення в Google" className="toolbar-button " src={hor_search} />
-            <img id="print" alt="Друкувати (Ctrl+P)" title="Друкувати (Ctrl+P)" className="toolbar-button " src={hor_print} />
-            <img id="copy" alt="Копіювати (Ctrl+C)" title="Копіювати (Ctrl+C)" className="toolbar-button " src={hor_copy} onClick={copyPicture} />
-            <img id="save" alt="Зберегти (Ctrl+S)" title="Зберегти (Ctrl+S)" className="toolbar-button " src={hor_save} onClick={downloadPage} />
-            <div className='toolbar-separator'></div>
-            <img id="close" alt="Закрити (Ctrl+X)" title="Закрити (Ctrl+X)" className="toolbar-button " src={hor_close} onClick={cancelScreen} />
-          </div>
-          <div id="toolbar_edit" className="toolbar toolbar-vertical" style={{ position: 'absolute', top: `${crop.y + crop.height - 195}px`, left: `${crop.x + crop.width + 6}px` }}>
-            <img id="pencil" alt="Олівець" title="Олівець" className="toolbar-button " src={draw_pencil} onClick={draw_arrow_with_hand} />
-            <img id="line" alt="Лінія" title="Лінія" className="toolbar-button " src={draw_line} />
-            <img id="arrow" alt="Стрілка" title="Стрілка" className="toolbar-button " src={draw_arrow} />
-            <img id="rectangle" alt="Прямокукник" title="Прямокукник" className="toolbar-button " src={draw_rectangle} />
-            <img id="marker" alt="Маркер" title="Маркер" className="toolbar-button " src={draw_marker} />
-            <img id="text" alt="Текст" title="Текст" className="toolbar-button " src={draw_text} />
-            <div className='toolbar-separator'></div>
-            <img id="undo" alt="Скасувати (Ctrl+Z)" title="Скасувати (Ctrl+Z)" className="toolbar-button " src={draw_undo} />
-          </div>
-        </div>
-      ) : ''
+        ) : ''
       }
     </div >
   );

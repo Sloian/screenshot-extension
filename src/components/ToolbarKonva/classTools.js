@@ -21,7 +21,8 @@ class ArrowDrawable extends Drawable {
   }
   render() {
     const points = [this.startx, this.starty, this.x, this.y];
-    return <Arrow points={points} fill="black" stroke="black" />;
+    console.log(points)
+    return <Arrow points={points} strokeWidth={3} fill="black" stroke="red" />;
   }
 }
 
@@ -35,8 +36,9 @@ class CircleDrawable extends ArrowDrawable {
     const dx = this.startx - this.x;
     const dy = this.starty - this.y;
     const radius = Math.sqrt(dx * dx + dy * dy);
+    console.log(radius)
     return (
-      <Circle radius={radius} x={this.startx} y={this.starty} stroke="black" />
+      <Circle strokeWidth={3} radius={radius} x={this.startx} y={this.starty} stroke="red" />
     );
   }
 }
@@ -50,7 +52,7 @@ class FreePathDrawable extends Drawable {
     this.points = [...this.points, x, y];
   }
   render() {
-    return <Line points={this.points} fill="black" stroke="black" />;
+    return <Line points={this.points} strokeWidth={5} fill="red" stroke="red" />;
   }
 }
 
@@ -58,6 +60,7 @@ class SceneWithDrawables extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      a: 0,
       drawables: [],
       newDrawable: [],
       newDrawableType: "FreePathDrawable"
@@ -88,8 +91,22 @@ class SceneWithDrawables extends Component {
     }
   };
 
+  handleMouseMove = e => {
+    const { newDrawable } = this.state;
+    console.log(newDrawable)
+    if (newDrawable.length === 1) {
+      const { x, y } = e.target.getStage().getPointerPosition();
+      const updatedNewDrawable = newDrawable[0];
+      updatedNewDrawable.registerMovement(x, y);
+      this.setState({
+        newDrawable: [updatedNewDrawable]
+      });
+    }
+  };
+
   handleMouseUp = e => {
     const { newDrawable, drawables } = this.state;
+
     if (newDrawable.length === 1) {
       const { x, y } = e.target.getStage().getPointerPosition();
       const drawableToAdd = newDrawable[0];
@@ -102,23 +119,30 @@ class SceneWithDrawables extends Component {
     }
   };
 
-  handleMouseMove = e => {
-    const { newDrawable } = this.state;
-    if (newDrawable.length === 1) {
-      const { x, y } = e.target.getStage().getPointerPosition();
-      const updatedNewDrawable = newDrawable[0];
-      updatedNewDrawable.registerMovement(x, y);
-      this.setState({
-        newDrawable: [updatedNewDrawable]
-      });
-    }
-  };
 
   render() {
     const drawables = [...this.state.drawables, ...this.state.newDrawable];
     return (
-      <div>
+      <div style={{ position: 'absolute', }}>
+        <Stage
+          onMouseDown={this.handleMouseDown}
+          onMouseUp={this.handleMouseUp}
+          onMouseMove={this.handleMouseMove}
+          width={window.innerWidth}
+          height={window.innerHeight}
+        >
+          <Layer
+            width={window.innerWidth}
+            height={window.innerHeight}
+          >
+            {drawables.map(drawable => {
+              return drawable.render();
+            })}
+          </Layer>
+        </Stage>
         <button
+          className="button-class"
+          style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
           onClick={e => {
             this.setState({ newDrawableType: "ArrowDrawable" });
           }}
@@ -126,6 +150,9 @@ class SceneWithDrawables extends Component {
           Draw Arrows
         </button>
         <button
+          className="button-class"
+          style={{ position: 'absolute', top: 0, left: 100, zIndex: 1 }}
+
           onClick={e => {
             this.setState({ newDrawableType: "CircleDrawable" });
           }}
@@ -133,26 +160,27 @@ class SceneWithDrawables extends Component {
           Draw Circles
         </button>
         <button
+          className="button-class"
+          style={{ position: 'absolute', top: 0, left: 200, zIndex: 1 }}
           onClick={e => {
             this.setState({ newDrawableType: "FreePathDrawable" });
           }}
         >
           Draw FreeHand!
         </button>
-        <Stage
-          onMouseDown={this.handleMouseDown}
-          onMouseUp={this.handleMouseUp}
-          onMouseMove={this.handleMouseMove}
-          width={900}
-          height={700}
+        <button
+          className="button-class"
+          style={{ position: 'absolute', top: 0, left: 300, zIndex: 1 }}
+          onClick={e => {
+            // console.log(this.state.drawables)
+            [...this.state.drawables].pop()
+            console.log(this.state.drawables.pop())
+          }
+          }
         >
-          <Layer>
-            {drawables.map(drawable => {
-              return drawable.render();
-            })}
-          </Layer>
-        </Stage>
-      </div>
+          Draw FreeHand!
+        </button>
+      </div >
     );
   }
 }
@@ -161,4 +189,4 @@ function App() {
   return <SceneWithDrawables />;
 }
 
-export default SceneWithDrawables;
+export default App;

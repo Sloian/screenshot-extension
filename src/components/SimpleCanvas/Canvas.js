@@ -1,17 +1,12 @@
 import { useOnDraw } from './Hooks';
 import React from 'react';
 
-const Canvas = ({
-  width,
-  height,
-  style,
-  setA
-}) => {
+const Canvas = ({ width, height, style, }) => {
 
   const {
     setCanvasRef,
     onCanvasMouseDown
-  } = useOnDraw(onDraw, setA);
+  } = useOnDraw(onDraw);
 
   function onDraw(ctx, point, prevPoint) {
     drawLine(prevPoint, point, ctx, '#ff3333', 5);
@@ -25,6 +20,7 @@ const Canvas = ({
     width
   ) {
 
+    console.log({ width })
     start = start ?? end;
     ctx.beginPath();
     ctx.lineWidth = width;
@@ -37,7 +33,6 @@ const Canvas = ({
     ctx.beginPath();
     ctx.arc(start.x, start.y, 2, 0, 2 * Math.PI);
     ctx.fill();
-
   }
 
   return (

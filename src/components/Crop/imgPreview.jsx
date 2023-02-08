@@ -13,7 +13,7 @@ export async function imgPreview(
 
 
   canvasPreview(image, canvas, crop, scale, rotate)
-  previewUrl = canvas.toDataURL('image/jpeg')
+  previewUrl = canvas.toDataURL('image/png')
 
   return setImgCrop(previewUrl)
 }

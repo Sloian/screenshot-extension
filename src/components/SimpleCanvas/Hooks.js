@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useOnDraw(onDraw, setA) {
+export function useOnDraw(onDraw) {
 
   const canvasRef = useRef(null);
   const isDrawingRef = useRef(false);

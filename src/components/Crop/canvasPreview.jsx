@@ -12,8 +12,9 @@ export async function canvasPreview(
 
 
   console.log("тут")
-  console.log(image.children[0].getContext('2d'))
-  console.log(image.children)
+  console.log(image.children[0].children[0].children)
+  // const childrenCanvas = image.children[0]
+  // console.log(image.children[0].getContext('2d'))
   // console.log(image.children[1].getContext('2d'))
   console.log(ctx)
 
@@ -48,9 +49,9 @@ export async function canvasPreview(
   ctx.scale(scale, scale)
   ctx.translate(-centerX, -centerY)
   ctx.drawImage(image.children[1], 0, 0)
-  ctx.drawImage(image.children[0], 0, 0)
 
-  console.log(ctx)
+  console.log('ПЕремальовую!!!!!!')
+  ctx.drawImage(image.children[0].children[0].children[0].children[0].children[0], 0, 0)
 
   ctx.restore()
 }
