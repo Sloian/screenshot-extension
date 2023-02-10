@@ -5,7 +5,6 @@ import { Stage, Layer, Arrow, Circle, Line, Text, Rect } from "react-konva";
 let startx, starty
 let points = []
 
-
 function TextDrawable(x, y) {
   return (<Text x={x} y={y} text='Simple Text' fontFamily='Calibri' fill='red' fontSize={30} draggable={true} />);
 }
@@ -14,13 +13,17 @@ function RectangleDrawable(x, y) {
   const width = startx - x;
   const height = starty - y;
 
-  return (<Rect x={x} y={y} width={width} height={height} stroke={'red'} strokeWidth={4} draggable />
-  );
+  return (<Rect x={x} y={y} width={width} height={height} stroke={'red'} strokeWidth={4} draggable />);
 }
 
 function ArrowDrawable(x, y) {
   points = [startx, starty, x, y]
-  return <Arrow points={points} fill="black" stroke="red" />;
+  return <Arrow points={points} fill="black" stroke="red" strokeWidth={4} />;
+}
+
+function LineDrawable(x, y) {
+  points = [startx, starty, x, y]
+  return <Line points={points} fill="black" stroke="red" strokeWidth={4} />;
 }
 
 function CircleDrawable(x, y) {
@@ -37,26 +40,24 @@ function FreePathDrawable(x, y) {
   return <Line points={points} strokeWidth={4} fill="red" stroke="red" />;
 }
 
-
-
 const drawableClasses = {
   FreePathDrawable,
   ArrowDrawable,
   CircleDrawable,
   RectangleDrawable,
-  TextDrawable
+  TextDrawable,
+  LineDrawable
 };
 
 const getNewDrawableBasedOnType = (x, y, type) => {
   return new drawableClasses[type](x, y);
 };
 
-export const Drawable = () => {
-
-  const [drawables, setDrawables] = useState([])
-  const [newDrawableType, setNewDrawableType] = useState(`FreePathDrawable`)
-  const [newDrawable, setNewDrawable] = useState([])
-  const [testUndo, setTestUndo] = useState(0)
+export const Drawable = (
+  { drawables, setNewDrawableType,
+    newDrawableType, setDrawables,
+    newDrawable, setNewDrawable,
+    toolbar_edit, toolbar_actions }) => {
 
   const handleMouseDown = e => {
     if (newDrawable.length === 0) {
@@ -70,6 +71,10 @@ export const Drawable = () => {
         y,
         newDrawableType
       )]);
+      toolbar_edit.current.style.display = 'none'
+      toolbar_actions.current.style.display = 'none'
+      console.log(toolbar_edit.current.children)
+      console.log(toolbar_edit.current.children)
     }
   };
 
@@ -87,13 +92,13 @@ export const Drawable = () => {
       const drawableToAdd = newDrawable[0];
       drawables.push(drawableToAdd);
       console.log(drawables)
-      // setDrawables([...drawables])
-      // drawables.push()
-      console.log(drawables)
       setNewDrawable([])
       points = []
       startx = 0
       starty = 0
+      toolbar_edit.current.style.display = 'flex'
+      toolbar_actions.current.style.display = 'flex'
+
     }
   };
 
@@ -115,78 +120,18 @@ export const Drawable = () => {
           width={window.innerWidth}
           height={window.innerHeight}
         >
-          <Layer
-          >
+          <Layer>
             {drawableForRender.map(drawable => {
               return drawable;
             })}
           </Layer>
         </Stage>
 
-        <button
-          className="button-class"
-          style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }}
-          onClick={e => {
-            setNewDrawableType("ArrowDrawable")
-          }}
-        >
-          Draw Arrows
-        </button>
-        <button
-          className="button-class"
-          style={{ position: 'absolute', top: 0, left: 100, zIndex: 1 }}
-          onClick={e => {
-            setNewDrawableType("CircleDrawable")
-          }}
-        >
-          Draw Circles
-        </button>
-        <button
-          className="button-class"
-          style={{ position: 'absolute', top: 0, left: 200, zIndex: 1 }}
-          onClick={e => {
-            setNewDrawableType("FreePathDrawable")
-          }}
-        >
-          Draw FreeHand!
-        </button>
-        <button
-          className="button-class"
-          style={{ position: 'absolute', top: 0, left: 330, zIndex: 1 }}
-          onClick={e => {
-            setNewDrawableType("RectangleDrawable")
-          }}
-        >
-          Rectangle
-        </button>
-        <button
-          className="button-class"
-          style={{ position: 'absolute', top: 0, left: 420, zIndex: 1 }}
-          onClick={e => {
-            setNewDrawableType("TextDrawable")
-          }}
-        >
-          Text
-        </button>
-        <button
-          className="button-class"
-          style={{ position: 'absolute', top: 0, left: 480, zIndex: 1 }}
-          onClick={e => {
-            console.log(drawables)
-            console.log(drawableForRender)
-            drawables.pop()
-            // setDrawables(a)
-            setTestUndo(prev => prev + 1)
-          }}
-        >
-          undo
-        </button>
       </div>
     );
   }
 
-  return (<SuperSceneWithDrawables
-  />)
+  return (<SuperSceneWithDrawables />)
 }
 
 // export default setNewDrawableType;
